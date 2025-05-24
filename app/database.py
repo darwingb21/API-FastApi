@@ -10,7 +10,9 @@ load_dotenv()
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/postgres")
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 print("======================")
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base() """
@@ -30,10 +32,13 @@ load_dotenv()
 # El segundo argumento es un valor por defecto si DATABASE_URL no está definida.
 # Usamos 'db' como host, que es el nombre del servicio de Postgres en docker-compose.yml
 # Si ejecutas la API fuera de Docker, cambia 'db' a 'localhost' o la IP de tu DB.
-SQLALCHEMY_DATABASE_URL = os.getenv(
+""" SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql://postgres:postgres@db:5432/postgres" # Valor por defecto para Docker Compose
-)
+) """
+
+DB_HOST = os.getenv("DB_HOST", "localhost")
+SQLALCHEMY_DATABASE_URL = f"postgresql://postgres:postgres@{DB_HOST}:5432/postgres"
 
 # Crear el motor de la base de datos
 # `pool_pre_ping=True` ayuda a manejar conexiones que podrían haberse cerrado
