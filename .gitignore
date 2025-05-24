@@ -1,0 +1,26 @@
+# Ignorar carpetas de entornos virtuales
+venv/
+.venv/
+env/
+
+# Ignorar archivos de caché y compilados
+__pycache__/
+*.pyc
+*.pytest_cache/
+
+# Ignorar archivos de configuración local
+
+.flaskenv
+
+# Ignorar archivos de editor
+.vscode/
+.idea/
+
+# Ignorar cualquier archivo de log o de datos generados
+*.log
+data/
+
+# Ignorar directorios de paquetes
+*.egg-info/
+dist/
+build/
