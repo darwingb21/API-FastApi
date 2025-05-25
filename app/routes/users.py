@@ -10,6 +10,11 @@ def crear_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db))
     db_usuario = crud.get_usuario_por_email(db, email=usuario.email)
     if db_usuario:
         raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    db_usuario_cpf = crud.get_usuario_por_cpf(db, cpf=usuario.cpf)
+    if db_usuario_cpf:
+        raise HTTPException(status_code=400, detail="CPF ya registrado")    
+    
     return crud.crear_usuario(db=db, usuario=usuario)
 
 @router.get("/", response_model=list[schemas.Usuario])
