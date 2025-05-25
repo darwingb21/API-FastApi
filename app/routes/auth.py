@@ -1,55 +1,28 @@
-""" from fastapi import FastAPI, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from . import models, schemas, crud, database, security
-from .database import SessionLocal, engine
-
-####
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from jose import jwt, JWTError
+from sqlalchemy.orm import Session
+from .. import schemas, crud, security, database
+from ..database import get_db
 
-#####
 
-models.Base.metadata.create_all(bind=engine)
+router = APIRouter(tags=["autenticación"])
 
-app = FastAPI()
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-@app.post("/usuarios/", response_model=schemas.Usuario)
+@router.post("/auth/register", response_model=schemas.Usuario)
 def crear_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
     db_usuario = crud.get_usuario_por_email(db, email=usuario.email)
     if db_usuario:
         raise HTTPException(status_code=400, detail="Email ya registrado")
     return crud.crear_usuario(db=db, usuario=usuario)
 
-@app.get("/usuarios/", response_model=list[schemas.Usuario])
-def leer_usuarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    usuarios = crud.get_usuarios(db, skip=skip, limit=limit)
-    return usuarios
-
-@app.get("/usuarios/{usuario_id}", response_model=schemas.Usuario)
-def leer_usuario(usuario_id: int, db: Session = Depends(get_db)):
-    db_usuario = crud.get_usuario(db, usuario_id=usuario_id)
-    if db_usuario is None:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    return db_usuario
 
 
-
-###
-@app.post("/login", response_model=schemas.Token)
+@router.post("/auth/login", response_model=schemas.Token)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(database.get_db)
 ):
-    print("0")
     user = crud.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -71,19 +44,15 @@ async def login(
         "token_type": "bearer"
     }
 
-@app.post("/refreshToken", response_model=schemas.Token)
-async def refresh_token( refresh_token: schemas.TokenRefresh ,  db: Session = Depends(database.get_db) ):
-    print("0")
-    
+@router.post("/auth/refresh-token", response_model=schemas.Token)
+async def refresh_token(refresh_token: schemas.TokenRefresh, db: Session = Depends(database.get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        print("1")
         payload = jwt.decode(refresh_token.refresh_token, security.SECRET_KEY, algorithms=[security.ALGORITHM])
-        print("2")
         if payload.get("type") != "refresh":
             raise credentials_exception
         email: str = payload.get("sub")
@@ -91,11 +60,11 @@ async def refresh_token( refresh_token: schemas.TokenRefresh ,  db: Session = De
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    print("3")
+    
     user = crud.get_usuario_por_email(db, email=email)
     if user is None:
         raise credentials_exception
-    print("4")
+    
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
     new_access_token = security.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
@@ -108,26 +77,3 @@ async def refresh_token( refresh_token: schemas.TokenRefresh ,  db: Session = De
         "refresh_token": new_refresh_token,
         "token_type": "bearer"
     }
-
-# Ruta protegida de ejemplo
-@app.get("/users/me/", response_model=schemas.Usuario)
-async def read_users_me(current_user: schemas.Usuario = Depends(security.get_current_user)):
-    return current_user
-
-### """
-
-from fastapi import FastAPI
-#from . import  database 
-from .database import Base
-
-from .database import engine
-from .routes import users, auth, protected
-
-# Configuración inicial
-Base.metadata.create_all(bind=engine)
-app = FastAPI()
-
-# Incluir routers
-app.include_router(users.router)
-app.include_router(auth.router)
-app.include_router(protected.router)

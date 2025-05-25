@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from . import models, schemas, security
+from .. import models, schemas, security
 
 def get_usuario(db: Session, usuario_id: int):
     return db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
@@ -15,19 +15,9 @@ def crear_usuario(db: Session, usuario: schemas.UsuarioCreate):
     db_usuario = models.Usuario(
         email=usuario.email,
         nombre=usuario.nombre,
-        password=hashed_password #password=usuario.password  # En producción, hashear la contraseña
+        password=hashed_password
     )
     db.add(db_usuario)
     db.commit()
     db.refresh(db_usuario)
     return db_usuario
-
-#####
-def authenticate_user(db: Session, email: str, password: str):
-    user = get_usuario_por_email(db, email)
-    if not user:
-        return False
-    if not security.verify_password(password, user.password):
-        return False
-    return user
-####
