@@ -6,8 +6,13 @@ class UsuarioBase(BaseModel):
     cpf: str
     administrador: int
 
+class UsuarioPassword(BaseModel):
+    email: EmailStr
+    password: str
+
 class UsuarioCreate(UsuarioBase):
     password: str
+
 
 class Usuario(UsuarioBase):
     id: int

@@ -1,5 +1,6 @@
 from .auth import Token, TokenData, TokenRefresh
-from .users import UsuarioBase, UsuarioCreate, Usuario, UsuarioInDB
+from .users import UsuarioBase, UsuarioCreate, Usuario, UsuarioInDB, UsuarioPassword
+from .products import ProductoBase,  ProductoUpdate, Producto
 
 __all__ = [
     'Token',
@@ -7,6 +8,10 @@ __all__ = [
     'TokenRefresh',
     'UsuarioBase',
     'UsuarioCreate',
+    'UsuarioPassword',
     'Usuario',
-    'UsuarioInDB'
+    'UsuarioInDB',
+    'ProductoBase',
+    'ProductoUpdate',
+    'Producto'
 ]

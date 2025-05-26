@@ -17,7 +17,6 @@ def crear_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db))
     return crud.crear_usuario(db=db, usuario=usuario)
 
 
-
 @router.post("/auth/login", response_model=schemas.Token)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -31,7 +30,7 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(days=security.REFRESH_TOKEN_EXPIRE_DAYS)
+    refresh_token_expires = timedelta(days=security.REFRESH_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
@@ -43,6 +42,34 @@ async def login(
         "refresh_token": refresh_token,
         "token_type": "bearer"
     }
+
+
+
+""" @router.post("/auth/login", response_model=schemas.Token)
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(database.get_db)
+):
+    user = crud.authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(days=security.REFRESH_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    refresh_token = security.create_refresh_token(
+        data={"sub": user.email}, expires_delta=refresh_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    } """
 
 @router.post("/auth/refresh-token", response_model=schemas.Token)
 async def refresh_token(refresh_token: schemas.TokenRefresh, db: Session = Depends(database.get_db)):
@@ -59,6 +86,7 @@ async def refresh_token(refresh_token: schemas.TokenRefresh, db: Session = Depen
         if email is None:
             raise credentials_exception
     except JWTError:
+        print("JWTError occurred")
         raise credentials_exception
     
     user = crud.get_usuario_por_email(db, email=email)
@@ -70,7 +98,7 @@ async def refresh_token(refresh_token: schemas.TokenRefresh, db: Session = Depen
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     new_refresh_token = security.create_refresh_token(
-        data={"sub": user.email}, expires_delta=timedelta(days=security.REFRESH_TOKEN_EXPIRE_DAYS)
+        data={"sub": user.email}, expires_delta=timedelta(days=security.REFRESH_TOKEN_EXPIRE_MINUTES)
     )
     return {
         "access_token": new_access_token,
