@@ -12,7 +12,7 @@ credentials_exception_administrator = HTTPException(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-@router.post("/", response_model=schemas.Producto)
+@router.post("/", response_model=schemas.Producto, status_code=status.HTTP_201_CREATED)
 async def crear_producto(
     producto: schemas.ProductoBase, 
     db: Session = Depends(get_db) , 
@@ -32,7 +32,8 @@ def listar_productos(
     min_precio: Optional[float] = None,
     max_precio: Optional[float] = None,
     disponible: Optional[bool] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: schemas.Usuario = Depends(security.get_current_user)
 ):
     return crud.get_productos(
         db,
@@ -47,8 +48,6 @@ def listar_productos(
 @router.get("/{producto_id}", response_model=schemas.Producto )
 def obtener_producto(producto_id: int, db: Session = Depends(get_db), current_user: schemas.Usuario = Depends(security.get_current_user)  ):
     
-    if current_user.administrador == 0:
-        raise credentials_exception_administrator
         
     db_producto = crud.get_producto(db, producto_id=producto_id)
     if db_producto is None:

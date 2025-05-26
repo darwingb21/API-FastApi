@@ -36,13 +36,10 @@ def crear_producto(db: Session, producto: schemas.ProductoBase):
         disponible= producto.disponible
     )
     db.add(db_producto)
-    print("1")
     db.commit()
-    print("2")
-
+    
     db.refresh(db_producto)
-    print("3")
-    print(db_producto)
+ 
     return db_producto
 
 def actualizar_producto(db: Session, producto_id: int, producto: schemas.ProductoUpdate):

@@ -3,7 +3,9 @@ from .user import (
     get_usuario_por_email,
     get_usuario_por_cpf,
     get_usuarios,
-    crear_usuario
+    crear_usuario,
+    actualizar_usuario,
+    eliminar_usuario
 )
 from .auth import authenticate_user
 
@@ -22,6 +24,8 @@ __all__ = [
     'get_usuario_por_cpf',
     'get_usuarios',
     'crear_usuario',
+    'actualizar_usuario',
+    'eliminar_usuario',
     'authenticate_user',
     'get_producto',
     'get_productos',
