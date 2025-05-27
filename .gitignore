@@ -3,6 +3,7 @@ venv/
 .venv/
 env/
 
+.bd
 # Ignorar archivos de caché y compilados
 __pycache__/
 *.pyc

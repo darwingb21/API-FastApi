@@ -5,16 +5,16 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 from . import schemas, models, database, crud
 from sqlalchemy.orm import Session
-
+from dotenv import load_dotenv
+load_dotenv()
 # Configuración
-SECRET_KEY = "tu_super_secreto"  # En producción usa variable de entorno
+SECRET_KEY = "clave_secreta_para_firma_de_jwt"  
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 5
 REFRESH_TOKEN_EXPIRE_MINUTES = 10
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)

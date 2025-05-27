@@ -11,9 +11,6 @@ class ProductoBase(BaseModel):
     fecha_validez: str
     imagen_url: str
 
-""" class ProductoCreate(ProductoBase):
-    fecha_validez: str
-    imagen_url: str  """
 
 class ProductoUpdate(BaseModel):
     descripcion: Optional[str] = None

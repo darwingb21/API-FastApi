@@ -43,7 +43,6 @@ def leer_usuarios(
     ):
     
 
-
     usuarios = crud.get_usuarios(db, skip=skip, limit=limit, email=email, nombre=nombre)
     if usuarios is None or len(usuarios) == 0:
         raise HTTPException(status_code=404, detail="Usuario(s) no encontrado")
@@ -72,7 +71,6 @@ def actualizar_usuario(
     if current_user.administrador == 0:
         raise credentials_exception_administrator
     
-    print(11)
     db_usuario = crud.get_usuario_por_email(db, email=usuario.email)
     if db_usuario:
         raise HTTPException(status_code=400, detail="Email ya registrado")
@@ -97,4 +95,4 @@ def eliminar_producto(user_id: int, db: Session = Depends(get_db), current_user:
 
     if not success:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    return {"message": "Usuario eliminado correctamente"}
+    return {"Nombre de prueba": "Cliente eliminado correctamente"}

@@ -21,7 +21,6 @@ def get_usuarios(db: Session, skip: int = 0, limit: int = 100, email: str = None
     
     return query.offset(skip).limit(limit).all()
 
-    #return db.query(models.Usuario).offset(skip).limit(limit).all()
 
 def crear_usuario(db: Session, usuario: schemas.UsuarioCreate):
     hashed_password = security.get_password_hash(usuario.password)

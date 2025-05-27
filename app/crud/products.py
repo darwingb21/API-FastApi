@@ -33,7 +33,9 @@ def crear_producto(db: Session, producto: schemas.ProductoBase):
         codigo_barras= producto.codigo_barras,
         seccion= producto.seccion,            
         stock=producto.stock,
-        disponible= producto.disponible
+        disponible= producto.disponible,
+        imagen_url= producto.imagen_url,
+        fecha_validez= producto.fecha_validez
     )
     db.add(db_producto)
     db.commit()

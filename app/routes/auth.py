@@ -14,6 +14,11 @@ def crear_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db))
     db_usuario = crud.get_usuario_por_email(db, email=usuario.email)
     if db_usuario:
         raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    db_usuario_cpf = crud.get_usuario_por_cpf(db, cpf=usuario.cpf)
+    if db_usuario_cpf:
+        raise HTTPException(status_code=400, detail="CPF ya registrado") 
+    
     return crud.crear_usuario(db=db, usuario=usuario)
 
 
@@ -23,12 +28,23 @@ async def login(
     db: Session = Depends(database.get_db)
 ):
     user = crud.authenticate_user(db, form_data.username, form_data.password)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    db_usuario = crud.get_usuario_por_email(db, email=form_data.username)
+    if db_usuario:
+        raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    db_usuario_cpf = crud.get_usuario_por_cpf(db, cpf=form_data.cpf)
+    if db_usuario_cpf:
+        raise HTTPException(status_code=400, detail="CPF ya registrado")
+
+
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
     refresh_token_expires = timedelta(days=security.REFRESH_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
@@ -43,33 +59,6 @@ async def login(
         "token_type": "bearer"
     }
 
-
-
-""" @router.post("/auth/login", response_model=schemas.Token)
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(database.get_db)
-):
-    user = crud.authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(days=security.REFRESH_TOKEN_EXPIRE_MINUTES)
-    access_token = security.create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    refresh_token = security.create_refresh_token(
-        data={"sub": user.email}, expires_delta=refresh_token_expires
-    )
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_type": "bearer"
-    } """
 
 @router.post("/auth/refresh-token", response_model=schemas.Token)
 async def refresh_token(refresh_token: schemas.TokenRefresh, db: Session = Depends(database.get_db)):
