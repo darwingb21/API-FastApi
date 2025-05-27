@@ -8,7 +8,7 @@ load_dotenv()
 
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "") # Docker
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
+engine = create_engine("postgresql://postgress:eK0BGy3vmfd6be9ZUz6xuqkNHLVE8ty5@dpg-d0qjh9emcj7s73e3g8l0-a/postgress_xgwp", pool_pre_ping=True)
 
 Base = declarative_base()
 
