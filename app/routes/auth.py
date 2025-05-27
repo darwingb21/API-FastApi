@@ -36,15 +36,6 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    db_usuario = crud.get_usuario_por_email(db, email=form_data.username)
-    if db_usuario:
-        raise HTTPException(status_code=400, detail="Email ya registrado")
-    
-    db_usuario_cpf = crud.get_usuario_por_cpf(db, cpf=form_data.cpf)
-    if db_usuario_cpf:
-        raise HTTPException(status_code=400, detail="CPF ya registrado")
-
-
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
     refresh_token_expires = timedelta(days=security.REFRESH_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
