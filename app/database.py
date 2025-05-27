@@ -6,10 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
-#DB_HOST = os.getenv("DB_HOST", "localhost") #local
-DB_HOST = os.getenv("DB_HOST", "bd") # Docker
-SQLALCHEMY_DATABASE_URL = f"postgresql://postgres:postgres@{DB_HOST}:5432/postgres"
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "") # Docker
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 
